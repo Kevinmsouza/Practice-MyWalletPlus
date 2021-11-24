@@ -3,7 +3,7 @@ import cors from "cors";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
-import connection from "./database.js";
+import connection from "./database/database.js";
 
 const app = express();
 app.use(cors());

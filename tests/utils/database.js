@@ -1,4 +1,4 @@
-import connection from "../../src/database.js";
+import connection from "../../src/database/database.js";
 
 export async function clearDatabase () {
   await connection.query(`TRUNCATE "financialEvents" RESTART IDENTITY`);

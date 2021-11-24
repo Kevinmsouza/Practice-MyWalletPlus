@@ -2,7 +2,7 @@ import bcrypt from "bcrypt";
 import faker from "faker";
 import jwt from "jsonwebtoken";
 
-import connection from "../../src/database.js";
+import connection from "../../src/database/database.js";
 
 export async function createUser ({ name, email, password } = {}) {
   const data = {
