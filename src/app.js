@@ -1,7 +1,6 @@
 /* eslint-disable consistent-return */
 import express from 'express';
 import cors from 'cors';
-import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import connection from './database/database.js';
 import * as userControllers from './controllers/userControllers.js';
@@ -12,36 +11,7 @@ app.use(express.json());
 
 app.post('/sign-up', userControllers.signUp);
 
-app.post('/sign-in', async (req, res) => {
-    try {
-        const { email, password } = req.body;
-
-        if (!email || !password) {
-            return res.sendStatus(400);
-        }
-
-        const user = await connection.query(
-            'SELECT * FROM "users" WHERE "email"=$1',
-            [email],
-        );
-
-        if (!user.rows[0] || !bcrypt.compareSync(password, user.rows[0].password)) {
-            return res.sendStatus(401);
-        }
-
-        const token = jwt.sign({
-            id: user.rows[0].id,
-        }, process.env.JWT_SECRET);
-
-        res.send({
-            token,
-        });
-    } catch (err) {
-        // eslint-disable-next-line no-console
-        console.error(err);
-        res.sendStatus(500);
-    }
-});
+app.post('/sign-in', userControllers.signIn);
 
 app.post('/financial-events', async (req, res) => {
     try {
