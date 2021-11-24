@@ -1,22 +1,8 @@
-import jwt from 'jsonwebtoken';
 import connection from '../database/database';
 
 async function getHistory(req, res) {
     try {
-        const authorization = req.headers.authorization || '';
-        const token = authorization.split('Bearer ')[1];
-
-        if (!token) {
-            return res.sendStatus(401);
-        }
-
-        let user;
-
-        try {
-            user = jwt.verify(token, process.env.JWT_SECRET);
-        } catch {
-            return res.sendStatus(401);
-        }
+        const { user } = res.locals;
 
         const events = await connection.query(
             'SELECT * FROM "financialEvents" WHERE "userId"=$1 ORDER BY "id" DESC',
@@ -33,20 +19,7 @@ async function getHistory(req, res) {
 
 async function newEvent(req, res) {
     try {
-        const authorization = req.headers.authorization || '';
-        const token = authorization.split('Bearer ')[1];
-
-        if (!token) {
-            return res.sendStatus(401);
-        }
-
-        let user;
-
-        try {
-            user = jwt.verify(token, process.env.JWT_SECRET);
-        } catch {
-            return res.sendStatus(401);
-        }
+        const { user } = res.locals;
 
         const { value, type } = req.body;
 
@@ -77,20 +50,7 @@ async function newEvent(req, res) {
 
 async function getTotal(req, res) {
     try {
-        const authorization = req.headers.authorization || '';
-        const token = authorization.split('Bearer ')[1];
-
-        if (!token) {
-            return res.sendStatus(401);
-        }
-
-        let user;
-
-        try {
-            user = jwt.verify(token, process.env.JWT_SECRET);
-        } catch {
-            return res.sendStatus(401);
-        }
+        const { user } = res.locals;
 
         const events = await connection.query(
             'SELECT * FROM "financialEvents" WHERE "userId"=$1 ORDER BY "id" DESC',
