@@ -6,6 +6,7 @@
   "main": "index.js",
   "scripts": {
     "test": "NODE_ENV=test npx jest -i",
+    "test-watch": "NODE_ENV=test npx jest --watch -i",
     "dev": "npx nodemon src/server.js"
   },
   "keywords": [],
