@@ -4,6 +4,7 @@ import cors from 'cors';
 import jwt from 'jsonwebtoken';
 import connection from './database/database.js';
 import * as userControllers from './controllers/userControllers.js';
+import * as financialEventControllers from './controllers/financialEventControllers.js';
 
 const app = express();
 app.use(cors());
@@ -57,35 +58,7 @@ app.post('/financial-events', async (req, res) => {
     }
 });
 
-app.get('/financial-events', async (req, res) => {
-    try {
-        const authorization = req.headers.authorization || '';
-        const token = authorization.split('Bearer ')[1];
-
-        if (!token) {
-            return res.sendStatus(401);
-        }
-
-        let user;
-
-        try {
-            user = jwt.verify(token, process.env.JWT_SECRET);
-        } catch {
-            return res.sendStatus(401);
-        }
-
-        const events = await connection.query(
-            'SELECT * FROM "financialEvents" WHERE "userId"=$1 ORDER BY "id" DESC',
-            [user.id],
-        );
-
-        res.send(events.rows);
-    } catch (err) {
-        // eslint-disable-next-line no-console
-        console.error(err);
-        res.sendStatus(500);
-    }
-});
+app.get('/financial-events', financialEventControllers.getHistory);
 
 app.get('/financial-events/sum', async (req, res) => {
     try {
