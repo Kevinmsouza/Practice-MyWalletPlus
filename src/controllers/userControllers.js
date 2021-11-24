@@ -10,8 +10,9 @@ async function signUp(req, res) {
         return res.sendStatus(409);
     }
 
-    if (await userServices.createUser({ name, email, password })) return res.sendStatus(201);
-
+    if (await userServices.createUser({ name, email, password })) {
+        return res.sendStatus(201);
+    }
     return res.sendStatus(500);
 }
 
@@ -27,7 +28,9 @@ async function signIn(req, res) {
     }
 
     const token = userServices.signToken({ email });
-    if (token) return res.send({ token });
+    if (token) {
+        return res.send({ token });
+    }
     return res.sendStatus(500);
 }
 
