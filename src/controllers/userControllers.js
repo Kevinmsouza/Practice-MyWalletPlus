@@ -1,6 +1,3 @@
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import connection from '../database/database.js';
 import * as userServices from '../services/userServices.js';
 
 async function signUp(req, res) {
@@ -19,34 +16,19 @@ async function signUp(req, res) {
 }
 
 async function signIn(req, res) {
-    try {
-        const { email, password } = req.body;
+    const { email, password } = req.body;
 
-        if (!email || !password) {
-            return res.sendStatus(400);
-        }
-
-        const user = await connection.query(
-            'SELECT * FROM "users" WHERE "email"=$1',
-            [email],
-        );
-
-        if (!user.rows[0] || !bcrypt.compareSync(password, user.rows[0].password)) {
-            return res.sendStatus(401);
-        }
-
-        const token = jwt.sign({
-            id: user.rows[0].id,
-        }, process.env.JWT_SECRET);
-
-        return res.send({
-            token,
-        });
-    } catch (err) {
-        // eslint-disable-next-line no-console
-        console.error(err);
-        return res.sendStatus(500);
+    if (!email || !password) {
+        return res.sendStatus(400);
     }
+
+    if (!await userServices.checkPasswordCompatibility({ email, password })) {
+        return res.sendStatus(401);
+    }
+
+    const token = userServices.signToken({ email });
+    if (token) return res.send({ token });
+    return res.sendStatus(500);
 }
 
 export {
