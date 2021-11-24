@@ -1,8 +1,5 @@
-/* eslint-disable consistent-return */
 import express from 'express';
 import cors from 'cors';
-import jwt from 'jsonwebtoken';
-import connection from './database/database.js';
 import * as userControllers from './controllers/userControllers.js';
 import * as financialEventControllers from './controllers/financialEventControllers.js';
 
@@ -10,86 +7,13 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// USER
 app.post('/sign-up', userControllers.signUp);
-
 app.post('/sign-in', userControllers.signIn);
 
-app.post('/financial-events', async (req, res) => {
-    try {
-        const authorization = req.headers.authorization || '';
-        const token = authorization.split('Bearer ')[1];
-
-        if (!token) {
-            return res.sendStatus(401);
-        }
-
-        let user;
-
-        try {
-            user = jwt.verify(token, process.env.JWT_SECRET);
-        } catch {
-            return res.sendStatus(401);
-        }
-
-        const { value, type } = req.body;
-
-        if (!value || !type) {
-            return res.sendStatus(400);
-        }
-
-        if (!['INCOME', 'OUTCOME'].includes(type)) {
-            return res.sendStatus(400);
-        }
-
-        if (value < 0) {
-            return res.sendStatus(400);
-        }
-
-        await connection.query(
-            'INSERT INTO "financialEvents" ("userId", "value", "type") VALUES ($1, $2, $3)',
-            [user.id, value, type],
-        );
-
-        res.sendStatus(201);
-    } catch (err) {
-        // eslint-disable-next-line no-console
-        console.error(err);
-        res.sendStatus(500);
-    }
-});
-
+// FINANCIAL EVENT
+app.post('/financial-events', financialEventControllers.newEvent);
 app.get('/financial-events', financialEventControllers.getHistory);
-
-app.get('/financial-events/sum', async (req, res) => {
-    try {
-        const authorization = req.headers.authorization || '';
-        const token = authorization.split('Bearer ')[1];
-
-        if (!token) {
-            return res.sendStatus(401);
-        }
-
-        let user;
-
-        try {
-            user = jwt.verify(token, process.env.JWT_SECRET);
-        } catch {
-            return res.sendStatus(401);
-        }
-
-        const events = await connection.query(
-            'SELECT * FROM "financialEvents" WHERE "userId"=$1 ORDER BY "id" DESC',
-            [user.id],
-        );
-
-        const sum = events.rows.reduce((total, event) => (event.type === 'INCOME' ? total + event.value : total - event.value), 0);
-
-        res.send({ sum });
-    } catch (err) {
-        // eslint-disable-next-line no-console
-        console.error(err);
-        res.sendStatus(500);
-    }
-});
+app.get('/financial-events/sum', financialEventControllers.getTotal);
 
 export default app;
