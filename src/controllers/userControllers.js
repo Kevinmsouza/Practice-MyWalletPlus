@@ -1,5 +1,5 @@
-import bcrypt from "bcrypt";
-import connection from "../database/database.js";
+import bcrypt from 'bcrypt';
+import connection from '../database/database.js';
 
 async function signUp(req, res) {
     try {
@@ -10,8 +10,8 @@ async function signUp(req, res) {
         }
 
         const existingUserWithGivenEmail = await connection.query(
-            `SELECT * FROM "users" WHERE "email"=$1`,
-            [email]
+            'SELECT * FROM "users" WHERE "email"=$1',
+            [email],
         );
 
         if (existingUserWithGivenEmail.rows[0]) {
@@ -21,17 +21,18 @@ async function signUp(req, res) {
         const hashedPassword = bcrypt.hashSync(password, 12);
 
         await connection.query(
-            `INSERT INTO "users" ("name", "email", "password") VALUES ($1, $2, $3)`,
-            [name, email, hashedPassword]
+            'INSERT INTO "users" ("name", "email", "password") VALUES ($1, $2, $3)',
+            [name, email, hashedPassword],
         );
 
-        res.sendStatus(201);
+        return res.sendStatus(201);
     } catch (err) {
+        // eslint-disable-next-line no-console
         console.error(err);
-        res.sendStatus(500);
+        return res.sendStatus(500);
     }
 }
 
 export {
     signUp,
-}
+};

@@ -1,3 +1,4 @@
+/* eslint-disable*/
 import connection from "../../src/database/database.js";
 
 /* 

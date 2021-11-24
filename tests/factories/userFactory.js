@@ -1,3 +1,4 @@
+/* eslint-disable*/
 import bcrypt from "bcrypt";
 import faker from "faker";
 import jwt from "jsonwebtoken";
