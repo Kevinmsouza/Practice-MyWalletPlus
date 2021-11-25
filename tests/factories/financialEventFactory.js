@@ -1,4 +1,5 @@
-import connection from "../../src/database.js";
+/* eslint-disable*/
+import connection from "../../src/database/database.js";
 
 /* 
  * Math.floor é muito lento, 2.132465 << 0 === 2 e 2.9823465 << 0 === 2 e é rápido
