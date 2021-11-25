@@ -1,20 +1,14 @@
 import connection from '../database/database';
+import * as financialEventServices from '../services/financialEventServices.js';
 
 async function getHistory(req, res) {
-    try {
-        const { user } = res.locals;
+    const { user } = res.locals;
 
-        const events = await connection.query(
-            'SELECT * FROM "financialEvents" WHERE "userId"=$1 ORDER BY "id" DESC',
-            [user.id],
-        );
-
-        return res.send(events.rows);
-    } catch (err) {
-        // eslint-disable-next-line no-console
-        console.error(err);
-        return res.sendStatus(500);
+    const history = await financialEventServices.getHistoryByUser({ user });
+    if (history) {
+        return res.send(history);
     }
+    return res.sendStatus(500);
 }
 
 async function newEvent(req, res) {
