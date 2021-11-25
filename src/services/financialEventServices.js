@@ -8,7 +8,7 @@ async function getHistoryByUser({ user }) {
     return result;
 }
 
-async function calculateTotal({ history }) {
+function calculateTotal({ history }) {
     const sum = history.reduce((total, event) => (event.type === 'INCOME' ? total + event.value : total - event.value), 0);
     return sum;
 }

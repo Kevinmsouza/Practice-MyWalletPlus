@@ -49,7 +49,7 @@ async function getTotal(req, res) {
     if (!history) {
         return res.sendStatus(500);
     }
-    const sum = history.reduce((total, event) => (event.type === 'INCOME' ? total + event.value : total - event.value), 0);
+    const sum = financialEventServices.calculateTotal({ history });
     return res.send({ sum });
 }
 
