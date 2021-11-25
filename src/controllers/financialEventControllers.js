@@ -43,22 +43,14 @@ async function newEvent(req, res) {
 }
 
 async function getTotal(req, res) {
-    try {
-        const { user } = res.locals;
+    const { user } = res.locals;
 
-        const events = await connection.query(
-            'SELECT * FROM "financialEvents" WHERE "userId"=$1 ORDER BY "id" DESC',
-            [user.id],
-        );
-
-        const sum = events.rows.reduce((total, event) => (event.type === 'INCOME' ? total + event.value : total - event.value), 0);
-
-        return res.send({ sum });
-    } catch (err) {
-        // eslint-disable-next-line no-console
-        console.error(err);
+    const history = await financialEventServices.getHistoryByUser({ user });
+    if (!history) {
         return res.sendStatus(500);
     }
+    const sum = history.reduce((total, event) => (event.type === 'INCOME' ? total + event.value : total - event.value), 0);
+    return res.send({ sum });
 }
 
 export {
