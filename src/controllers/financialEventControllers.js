@@ -1,4 +1,3 @@
-import connection from '../database/database';
 import * as financialEventServices from '../services/financialEventServices.js';
 
 async function getHistory(req, res) {
@@ -12,34 +11,17 @@ async function getHistory(req, res) {
 }
 
 async function newEvent(req, res) {
-    try {
-        const { user } = res.locals;
+    const { user } = res.locals;
 
-        const { value, type } = req.body;
-
-        if (!value || !type) {
-            return res.sendStatus(400);
-        }
-
-        if (!['INCOME', 'OUTCOME'].includes(type)) {
-            return res.sendStatus(400);
-        }
-
-        if (value < 0) {
-            return res.sendStatus(400);
-        }
-
-        await connection.query(
-            'INSERT INTO "financialEvents" ("userId", "value", "type") VALUES ($1, $2, $3)',
-            [user.id, value, type],
-        );
-
-        return res.sendStatus(201);
-    } catch (err) {
-        // eslint-disable-next-line no-console
-        console.error(err);
-        return res.sendStatus(500);
+    const { value, type } = req.body;
+    if (!value || !type || !['INCOME', 'OUTCOME'].includes(type) || value < 0) {
+        return res.sendStatus(400);
     }
+
+    if (financialEventServices.createNewEvent({ user, value, type })) {
+        return res.sendStatus(201);
+    }
+    return res.sendStatus(500);
 }
 
 async function getTotal(req, res) {

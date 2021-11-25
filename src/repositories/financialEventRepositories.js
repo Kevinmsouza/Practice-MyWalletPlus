@@ -15,6 +15,21 @@ async function getFinancialEventsByUserId({ userId }) {
     }
 }
 
+async function createNewEvent({ userId, value, type }) {
+    try {
+        const result = await connection.query(`
+                INSERT INTO "financialEvents" 
+                ("userId", "value", "type")
+                VALUES ($1, $2, $3)
+            ;`, [userId, value, type]);
+        return result.rowCount;
+    } catch (error) {
+        console.log(error);
+        return false;
+    }
+}
+
 export {
     getFinancialEventsByUserId,
+    createNewEvent,
 };
